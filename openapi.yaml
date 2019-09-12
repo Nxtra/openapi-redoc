@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Conference API
+  termsOfService: 'https://lol.com/terms/'
+  contact:
+    email: contact@example.com
+    url: 'http://example.com/contact'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  x-logo:
+    url: 'https://apis.guru/openapi-template/logo.png'
+  description: |
+    This is an **example** API to demonstrate features of OpenAPI specification
+    # Introduction
+    This specification is intended to to be a good starting point for describing your API in 
+    [OpenAPI/Swagger format](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
+    It also demonstrates features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo) tool and 
+    [ReDoc](https://github.com/Rebilly/ReDoc) documentation engine. So beyond the standard OpenAPI syntax we use a few 
+    [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
+
+    # OpenAPI Specification
+    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
+    allows both humans and computers to discover and understand the capabilities of the service without access to source
+    code, documentation, or through network traffic inspection. When properly defined via OpenAPI, a consumer can 
+    understand and interact with the remote service with a minimal amount of implementation logic. Similar to what
+    interfaces have done for lower-level programming, OpenAPI removes the guesswork in calling the service.
+servers:
+  - url: 'https://example-conference.com/api/'
+    description: Base URL for the API
+paths:
+  /session/all:
+    get:
+      description: Get all sessions of the conference
+      operationId: getAllSessions
+      responses:
+        '200':
+          description: The list of sessions is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllSessionsResponse'
+        '404':
+          description: Could not find any session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/404Response'
+  /session/create:
+    post:
+      description: Create a new session on the conference
+      operationId: createSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        '202':
+          description: Session successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+components:
+  schemas:
+    Session:
+      type: object
+      required:
+        - subject
+        - speaker
+      properties:
+        subject:
+          type: string
+          example: API first development with OAS
+        duration:
+          type: number
+          description: The duration of the session in minutes
+          example: 20
+        timestamp:
+          type: string
+          description: Timestamp in milliseconds at which this session will take place
+          example: '1570202335000'
+        speaker:
+          $ref: '#/components/schemas/Speaker'
+    Speaker:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Nick
+        lastName:
+          type: string
+          example: Van Hoof
+        company:
+          $ref: '#/components/schemas/Company'
+    Company:
+      type: object
+      properties:
+        companyName:
+          type: string
+          example: Ordina
+        companyCity:
+          type: string
+          description: City where the company is based
+          example: Mechelen
+    GetAllSessionsResponse:
+      type: object
+      required:
+        - sessions
+      properties:
+        sessions:
+          type: array
+          description: List of sessions
+          items:
+            $ref: '#/components/schemas/Session'
+    CreateSessionResponse:
+      required:
+        - sessionId
+      allOf:
+        - $ref: '#/components/schemas/Session'
+        - type: object
+          properties:
+            sessionId:
+              type: string
+              example: '11313'
+    GenericResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: This is the response message
+    404Response:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GenericResponse'
